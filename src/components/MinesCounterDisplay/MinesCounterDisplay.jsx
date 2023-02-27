@@ -8,14 +8,14 @@ import { DIGIT_DIVIDER } from "../../constants";
 import "../../styles/common/styles.css";
 
 const MinesCounterDisplay = () => {
-  const MINES_COUNT = 40;
-  const [mines, setMines] = useState(MINES_COUNT);
+  const MAX_MINES_COUNT = 40;
+  const [minesLeftCount, setMinesLeftCount] = useState(MAX_MINES_COUNT);
 
   return (
     <div className="display">
-      <DisplayDigit value={getValueByNumericalDigit(mines, DIGIT_DIVIDER.HUNDREDS)} />
-      <DisplayDigit value={getValueByNumericalDigit(mines, DIGIT_DIVIDER.TENS)} />
-      <DisplayDigit value={getValueByNumericalDigit(mines, DIGIT_DIVIDER.UNITS)} />
+      <DisplayDigit value={getValueByNumericalDigit(minesLeftCount, DIGIT_DIVIDER.HUNDREDS)} />
+      <DisplayDigit value={getValueByNumericalDigit(minesLeftCount, DIGIT_DIVIDER.TENS)} />
+      <DisplayDigit value={getValueByNumericalDigit(minesLeftCount, DIGIT_DIVIDER.UNITS)} />
     </div>
   );
 };
