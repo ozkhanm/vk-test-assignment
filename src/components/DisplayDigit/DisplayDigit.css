@@ -1,0 +1,9 @@
+.digit {
+  width: 28px;
+  height: 49px;
+
+  background: url("/src/assets/sprites/minesweeper-sprites.png");
+  background-position: 0px 0px;
+  background-size: 300px;
+  background-repeat: no-repeat;
+}
