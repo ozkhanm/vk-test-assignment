@@ -4,8 +4,27 @@
   padding: 0;
 
   background: url("/src/assets/sprites/minesweeper-sprites.png");
-  background-position: 1px -42px;
   background-size: 250px;
   background-repeat: no-repeat;
   border: none;
+}
+
+.default {
+  background-position: 1px -42px;
+}
+
+.default-active {
+  background-position: -48px -42px;
+}
+
+.cell-clicked {
+  background-position: -96px -42px;
+}
+
+.win {
+  background-position: -144px -42px;
+}
+
+.lose {
+  background-position: -192px -42px;
 }

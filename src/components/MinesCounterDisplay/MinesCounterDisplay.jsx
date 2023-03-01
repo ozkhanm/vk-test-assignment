@@ -3,12 +3,11 @@ import { useState } from "react";
 import DisplayDigit from "../DisplayDigit/DisplayDigit";
 
 import { getValueByNumericalDigit } from "../../helpers";
-import { DIGIT_DIVIDER } from "../../constants";
+import { DIGIT_DIVIDER, MAX_MINES_COUNT } from "../../constants";
 
 import "../../styles/common/styles.css";
 
 const MinesCounterDisplay = () => {
-  const MAX_MINES_COUNT = 40;
   const [minesLeftCount, setMinesLeftCount] = useState(MAX_MINES_COUNT);
 
   return (
