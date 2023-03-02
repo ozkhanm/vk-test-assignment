@@ -1,12 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { SMILE_STATUS } from "../../constants";
+import { SMILE_STATUS, MAX_MINES_COUNT } from "../../constants";
 
 const initialState = {
   boardMap: [],
   smileStatus: SMILE_STATUS.DEFAULT,
   gameEndStatus: false,
-  openArea: []
+  openArea: [],
+  minesLeft: MAX_MINES_COUNT
 };
 
 export const boardSlice = createSlice({
@@ -24,6 +25,12 @@ export const boardSlice = createSlice({
     },
     setOpenArea(state, { payload }) {
       state.openArea = payload;
+    },
+    decreaseMinesLeftCount(state) {
+      state.minesLeft--;
+    },
+    increaseMinesLeftCount(state) {
+      state.minesLeft++;
     }
   },
 });

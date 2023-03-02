@@ -21,6 +21,7 @@
   background-position: -90px -90px;
 }
 
+.cell:active,
 .cell-active {
   background-position: -30px -90px;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { boardSlice } from "../../store/reducers/BoardSlice";
@@ -14,7 +14,7 @@ const Cell = ({ row, cell }) => {
   const [isBlown, setIsBlown] = useState(false);
   const [cellDisplayStatus, setCellDisplayStatus] = useState(CELL_DISPLAY_STATUS.DEFAULT);
   const { boardMap, gameEndStatus, openArea } = useSelector(state => state.boardReducer);
-  const { setBoardMap, changeSmileStatus, changeGameEndStatus, setOpenArea } = boardSlice.actions;
+  const { setBoardMap, changeSmileStatus, changeGameEndStatus, setOpenArea, decreaseMinesLeftCount, increaseMinesLeftCount } = boardSlice.actions;
   let hasMine = false;
 
   if (boardMap.length !== 0) {
@@ -49,7 +49,7 @@ const Cell = ({ row, cell }) => {
     }
   }, [gameEndStatus, hasMine, isBlown, cellDisplayStatus]);
 
-  const cellClickHandler = () => {
+  const cellClickHandler = useCallback(() => {
     const value = boardMap[row][cell];
 
     if (value === 0) {
@@ -69,11 +69,9 @@ const Cell = ({ row, cell }) => {
 
       btnRef.current.classList.add("cell-blown-mine");
     }
-  };
+  }, [changeGameEndStatus, changeSmileStatus, cell, dispatch, boardMap, hasMine, row, setOpenArea]);
 
-  const cellMouseDownHandler = (e) => {
-    setCellDisplayStatus(CELL_DISPLAY_STATUS.DEFAULT);
-
+  const cellMouseDownHandler = useCallback((e) => {
     if (e.nativeEvent.which === 3) {
       return;
     }
@@ -90,17 +88,13 @@ const Cell = ({ row, cell }) => {
     }
 
     dispatch(changeSmileStatus(SMILE_STATUS.CELL_CLICKED));
+  }, [boardMap, cell, changeSmileStatus, dispatch, row, setBoardMap]);
 
-    btnRef.current.classList.add("cell-active");
-  };
-
-  const cellMouseUpHandler = () => {
+  const cellMouseUpHandler = useCallback(() => {
     dispatch(changeSmileStatus(SMILE_STATUS.DEFAULT));
+  }, [changeSmileStatus, dispatch]);
 
-    btnRef.current.classList.remove("cell-active");
-  };
-
-  const cellRightClickHandler = (e) => {
+  const cellRightClickHandler = useCallback((e) => {
     e.preventDefault();
 
     if (e.target.disabled) {
@@ -110,10 +104,12 @@ const Cell = ({ row, cell }) => {
     switch (cellDisplayStatus) {
       case CELL_DISPLAY_STATUS.DEFAULT:
         setCellDisplayStatus(CELL_DISPLAY_STATUS.FLAG);
+        dispatch(decreaseMinesLeftCount());
         break;
 
       case CELL_DISPLAY_STATUS.FLAG:
         setCellDisplayStatus(CELL_DISPLAY_STATUS.QUESTION_MARK);
+        dispatch(increaseMinesLeftCount());
         break;
 
       case CELL_DISPLAY_STATUS.QUESTION_MARK:
@@ -123,9 +119,9 @@ const Cell = ({ row, cell }) => {
       default:
         setCellDisplayStatus(CELL_DISPLAY_STATUS.DEFAULT);
     }
-  };
+  }, [cellDisplayStatus, decreaseMinesLeftCount, dispatch, increaseMinesLeftCount]);
 
-  const getButtonClassName = () => {
+  const getButtonClassName = useCallback(() => {
     let additionalClass;
 
     switch (cellDisplayStatus) {
@@ -147,7 +143,7 @@ const Cell = ({ row, cell }) => {
     }
 
     return `cell ${additionalClass}`;
-  };
+  }, [cellDisplayStatus]);
 
   return (
     <button 
