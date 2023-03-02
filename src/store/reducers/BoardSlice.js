@@ -6,7 +6,7 @@ const initialState = {
   boardMap: [],
   smileStatus: SMILE_STATUS.DEFAULT,
   gameEndStatus: false,
-  zeros: []
+  openArea: []
 };
 
 export const boardSlice = createSlice({
@@ -22,8 +22,8 @@ export const boardSlice = createSlice({
     changeGameEndStatus(state, { payload }) {
       state.gameEndStatus = payload;
     },
-    setZeros(state, { payload }) {
-      state.zeros = payload;
+    setOpenArea(state, { payload }) {
+      state.openArea = payload;
     }
   },
 });

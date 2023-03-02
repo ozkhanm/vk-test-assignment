@@ -50,11 +50,12 @@ export const generateMap = (rows, cols, mines, currentCoords) => {
   return map;
 };
 
-export const getSweeperZeros = (map, row, col) => {
+export const getAutoOpenArea = (map, row, col) => {
   const zeros = new Set();
+  const borders = new Set();
   const visited = new Set();
   const queue = [[row, col]];
-  const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
+  const directions = [[0, 1], [1, 0], [0, -1], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 
   while (queue.length > 0) {
     const [queueRow, queueCol] = queue.shift();
@@ -76,8 +77,13 @@ export const getSweeperZeros = (map, row, col) => {
           }
         }
       }
+    } else {
+      borders.add(`${queueRow},${queueCol}`);
     }
   }
 
-  return Array.from(zeros).map((coord) => coord.split(",").map((n) => parseInt(n)));
+  return [
+    ...Array.from(zeros).map((coord) => coord.split(",").map((n) => parseInt(n))),
+    ...Array.from(borders).map((coord) => coord.split(",").map((n) => parseInt(n)))
+  ];
 };

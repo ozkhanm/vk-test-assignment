@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { boardSlice } from "../../store/reducers/BoardSlice";
 
-import { generateMap, getSweeperZeros } from "../../helpers";
+import { generateMap, getAutoOpenArea } from "../../helpers";
 import { CELLS, MAX_MINES_COUNT, ROWS, SMILE_STATUS, CELL_DISPLAY_STATUS } from "../../constants";
 
 import "./Cell.css";
@@ -13,8 +13,8 @@ const Cell = ({ row, cell }) => {
   const btnRef = useRef();
   const [isBlown, setIsBlown] = useState(false);
   const [cellDisplayStatus, setCellDisplayStatus] = useState(CELL_DISPLAY_STATUS.DEFAULT);
-  const { boardMap, gameEndStatus, zeros } = useSelector(state => state.boardReducer);
-  const { setBoardMap, changeSmileStatus, changeGameEndStatus, setZeros } = boardSlice.actions;
+  const { boardMap, gameEndStatus, openArea } = useSelector(state => state.boardReducer);
+  const { setBoardMap, changeSmileStatus, changeGameEndStatus, setOpenArea } = boardSlice.actions;
   let hasMine = false;
 
   if (boardMap.length !== 0) {
@@ -22,8 +22,16 @@ const Cell = ({ row, cell }) => {
   }
 
   useEffect(() => {
-    if (zeros.findIndex(([zeroRow, zeroCol]) => zeroRow === row && zeroCol === cell) !== -1) {
-      btnRef.current.classList.add("cell-active");
+    if (openArea.findIndex(([zeroRow, zeroCol]) => zeroRow === row && zeroCol === cell) !== -1) {
+      const value = boardMap[row][cell];
+
+      if (value !== 0) {
+        btnRef.current.style.backgroundPosition = `-${(value - 1) * 31}px -120px`;
+      } else {
+        btnRef.current.classList.add("cell-active");
+      }
+      
+      btnRef.current.disabled = "disabled";
     }
   });
 
@@ -45,9 +53,9 @@ const Cell = ({ row, cell }) => {
     const value = boardMap[row][cell];
 
     if (value === 0) {
-      const zeros = getSweeperZeros(boardMap, row, cell);
+      const autoOpenArea = getAutoOpenArea(boardMap, row, cell);
 
-      dispatch(setZeros(zeros));
+      dispatch(setOpenArea(autoOpenArea));
     }
 
     btnRef.current.style.backgroundPosition = `-${(value - 1) * 31}px -120px`;
@@ -64,6 +72,12 @@ const Cell = ({ row, cell }) => {
   };
 
   const cellMouseDownHandler = (e) => {
+    setCellDisplayStatus(CELL_DISPLAY_STATUS.DEFAULT);
+
+    if (e.nativeEvent.which === 3) {
+      return;
+    }
+
     if (boardMap.length === 0) {
       const currentCoords = { currentRow: row, currentCell: cell };
       const boardMap = generateMap(ROWS, CELLS, MAX_MINES_COUNT, currentCoords);
@@ -73,10 +87,6 @@ const Cell = ({ row, cell }) => {
       const value = boardMap[row][cell];
 
       btnRef.current.style.backgroundPosition = `-${(value - 1) * 31}px -120px`;
-    }
-
-    if (e.nativeEvent.which === 3) {
-      e.stopPropagation();
     }
 
     dispatch(changeSmileStatus(SMILE_STATUS.CELL_CLICKED));
