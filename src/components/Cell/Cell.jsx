@@ -85,6 +85,8 @@ const Cell = ({ row, cell }) => {
       return;
     }
 
+    btnRef.current.classList.add("cell-active");
+
     if (boardMap.length === 0) {
       const currentCoords = { currentRow: row, currentCell: cell };
       const boardMap = generateMap(ROWS, CELLS, MAX_MINES_COUNT, currentCoords);
@@ -100,6 +102,7 @@ const Cell = ({ row, cell }) => {
   }, [boardMap, cell, changeSmileStatus, dispatch, row, setBoardMap]);
 
   const cellMouseUpHandler = useCallback(() => {
+    btnRef.current.classList.remove("cell-active");
     dispatch(changeSmileStatus(SMILE_STATUS.DEFAULT));
   }, [changeSmileStatus, dispatch]);
 
