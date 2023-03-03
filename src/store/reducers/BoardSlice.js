@@ -7,7 +7,8 @@ const initialState = {
   smileStatus: SMILE_STATUS.DEFAULT,
   gameEndStatus: false,
   openArea: [],
-  minesLeft: MAX_MINES_COUNT
+  minesLeft: MAX_MINES_COUNT,
+  gameResetStatus: false
 };
 
 export const boardSlice = createSlice({
@@ -31,6 +32,10 @@ export const boardSlice = createSlice({
     },
     increaseMinesLeftCount(state) {
       state.minesLeft++;
+    },
+    reset: () => initialState,
+    changeGameResetStatus(state, { payload }) {
+      state.gameResetStatus = payload;
     }
   },
 });

@@ -21,3 +21,4 @@ export const CELL_DISPLAY_STATUS = {
 export const ROWS = 16;
 export const CELLS = 16;
 export const MAX_MINES_COUNT = 40;
+export const INIT_TIME = 40;

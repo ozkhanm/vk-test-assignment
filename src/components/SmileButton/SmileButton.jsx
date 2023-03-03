@@ -1,12 +1,30 @@
-import { useSelector } from "react-redux";
+import { useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { boardSlice } from "../../store/reducers/BoardSlice";
 
 import { SMILE_STATUS } from "../../constants";
 
 import "./SmileButton.css";
 
 const SmileButton = () => {
+  const dispatch = useDispatch();
   const { smileStatus } = useSelector(state => state.boardReducer);
+  const { reset, changeSmileStatus, changeGameResetStatus } = boardSlice.actions;
   let additionalButtonClass = "default";
+
+  const buttonClickHandler = useCallback(() => {
+    dispatch(reset());
+    dispatch(changeGameResetStatus(true));
+  }, [dispatch, reset, changeGameResetStatus]);
+
+  const onMouseDownHandler = useCallback(() => {
+    dispatch(changeSmileStatus(SMILE_STATUS.DEFAULT_ACTIVE));
+  }, [dispatch, changeSmileStatus]);
+
+  const onMouseUpHandler = useCallback(() => {
+    dispatch(changeSmileStatus(SMILE_STATUS.DEFAULT));
+  }, [dispatch, changeSmileStatus]);
 
   switch(smileStatus) {
     case SMILE_STATUS.DEFAULT:
@@ -38,6 +56,9 @@ const SmileButton = () => {
     <button
       type="button"
       className={`smile-button ${additionalButtonClass}`}
+      onClick={buttonClickHandler}
+      onMouseDown={onMouseDownHandler}
+      onMouseUp={onMouseUpHandler}
     />
   );
 };

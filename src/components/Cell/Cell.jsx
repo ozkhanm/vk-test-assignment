@@ -13,8 +13,9 @@ const Cell = ({ row, cell }) => {
   const btnRef = useRef();
   const [isBlown, setIsBlown] = useState(false);
   const [cellDisplayStatus, setCellDisplayStatus] = useState(CELL_DISPLAY_STATUS.DEFAULT);
-  const { boardMap, gameEndStatus, openArea } = useSelector(state => state.boardReducer);
-  const { setBoardMap, changeSmileStatus, changeGameEndStatus, setOpenArea, decreaseMinesLeftCount, increaseMinesLeftCount } = boardSlice.actions;
+  const { boardMap, gameEndStatus, openArea, gameResetStatus } = useSelector(state => state.boardReducer);
+  const { setBoardMap, changeSmileStatus, changeGameEndStatus, 
+    setOpenArea, decreaseMinesLeftCount, increaseMinesLeftCount, changeGameResetStatus } = boardSlice.actions;
   let hasMine = false;
 
   if (boardMap.length !== 0) {
@@ -48,6 +49,14 @@ const Cell = ({ row, cell }) => {
       }
     }
   }, [gameEndStatus, hasMine, isBlown, cellDisplayStatus]);
+
+  useEffect(() => {
+    if (gameResetStatus) {
+      btnRef.current.disabled = "";
+      btnRef.current.className = "cell cell-default";
+      btnRef.current.style = {};
+    }
+  }, [changeGameResetStatus, gameResetStatus, dispatch]);
 
   const cellClickHandler = useCallback(() => {
     const value = boardMap[row][cell];
