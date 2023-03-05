@@ -63,6 +63,10 @@ const Cell = ({ row, cell }) => {
       if (cellDisplayStatus === CELL_DISPLAY_STATUS.FLAG) {
         btnRef.current.classList.add("cell-mine-defused");
       }
+
+      if (isBlown) {
+        btnRef.current.classList.remove("cell-mine-defused");
+      }
     }
 
     if (smileStatus === SMILE_STATUS.WIN) {
@@ -95,8 +99,10 @@ const Cell = ({ row, cell }) => {
       return;
     }
 
-    btnRef.current.classList.add(`cell-active-${value}`);
-    btnRef.current.disabled = "disabled";
+    if (value !== "#") {
+      btnRef.current.classList.add(`cell-active-${value}`);
+      btnRef.current.disabled = "disabled";
+    }
 
     if (!hasMine && value !== 0) {
       dispatch(addOpenedCells(`${row},${cell}`));
