@@ -60,7 +60,7 @@ const Cell = ({ row, cell }) => {
         btnRef.current.classList.add("cell-mine");
       }
 
-      if (cellDisplayStatus === CELL_DISPLAY_STATUS.FLAG) {
+      if (cellDisplayStatus === CELL_DISPLAY_STATUS.FLAG && hasMine) {
         btnRef.current.classList.add("cell-mine-defused");
       }
 
