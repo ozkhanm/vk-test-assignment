@@ -41,6 +41,7 @@ const TimerDisplay = () => {
     if (!gameEndStatus && timeLeft === 0) {
       dispatch(changeGameEndStatus(true));
       dispatch(changeSmileStatus(SMILE_STATUS.LOSE));
+      setTimeLeft(INIT_TIME);
     }
 
     if (timeLeft === 0 || gameEndStatus || smileStatus === SMILE_STATUS.WIN) {
