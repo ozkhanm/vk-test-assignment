@@ -18,7 +18,14 @@ export const CELL_DISPLAY_STATUS = {
   QUESTION_MARK: "QUESTION_MARK"
 };
 
+export const ADDITIONAL_CELL_CLASSES = {
+  DEFAULT: "cell-default",
+  FLAG: "cell-flag",
+  QUESTION_MARK: "cell-question-mark"
+}
+
 export const ROWS = 16;
 export const CELLS = 16;
 export const MAX_MINES_COUNT = 40;
+export const CELLS_TO_OPEN = ROWS * CELLS - MAX_MINES_COUNT;
 export const INIT_TIME = 40;

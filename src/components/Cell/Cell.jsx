@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { boardSlice } from "../../store/reducers/BoardSlice";
 
 import { generateMap, getAutoOpenArea } from "../../helpers";
-import { CELLS, MAX_MINES_COUNT, ROWS, SMILE_STATUS, CELL_DISPLAY_STATUS } from "../../constants";
+import { CELLS, MAX_MINES_COUNT, ROWS, SMILE_STATUS, CELL_DISPLAY_STATUS, ADDITIONAL_CELL_CLASSES } from "../../constants";
 
 import "./Cell.css";
 
@@ -13,9 +13,25 @@ const Cell = ({ row, cell }) => {
   const btnRef = useRef();
   const [isBlown, setIsBlown] = useState(false);
   const [cellDisplayStatus, setCellDisplayStatus] = useState(CELL_DISPLAY_STATUS.DEFAULT);
-  const { boardMap, gameEndStatus, openArea, gameResetStatus } = useSelector(state => state.boardReducer);
-  const { setBoardMap, changeSmileStatus, changeGameEndStatus, 
-    setOpenArea, decreaseMinesLeftCount, increaseMinesLeftCount, changeGameResetStatus } = boardSlice.actions;
+  const {
+    boardMap,
+    gameEndStatus,
+    openArea,
+    gameResetStatus,
+    smileStatus,
+    minesLeft
+  } = useSelector(state => state.boardReducer);
+  const {
+    setBoardMap,
+    changeSmileStatus,
+    changeGameEndStatus,
+    setMinesLeftCount,
+    setOpenArea,
+    decreaseMinesLeftCount,
+    increaseMinesLeftCount,
+    changeGameResetStatus,
+    addOpenedCells
+  } = boardSlice.actions;
   let hasMine = false;
 
   if (boardMap.length !== 0) {
@@ -27,17 +43,17 @@ const Cell = ({ row, cell }) => {
       const value = boardMap[row][cell];
 
       if (value !== 0) {
-        btnRef.current.style.backgroundPosition = `-${(value - 1) * 31}px -120px`;
+        btnRef.current.classList.add(`cell-active-${value}`);
       } else {
         btnRef.current.classList.add("cell-active");
       }
       
       btnRef.current.disabled = "disabled";
     }
-  });
+  }, [boardMap, cell, openArea, row]);
 
   useEffect(() => {
-    if (gameEndStatus) {
+    if (gameEndStatus || smileStatus === SMILE_STATUS.WIN) {
       btnRef.current.disabled = "disabled";
 
       if (hasMine && !isBlown) {
@@ -48,27 +64,43 @@ const Cell = ({ row, cell }) => {
         btnRef.current.classList.add("cell-mine-defused");
       }
     }
-  }, [gameEndStatus, hasMine, isBlown, cellDisplayStatus]);
+
+    if (smileStatus === SMILE_STATUS.WIN) {
+      dispatch(setMinesLeftCount(0));
+    }
+  }, [gameEndStatus, hasMine, isBlown, cellDisplayStatus, smileStatus, setMinesLeftCount, dispatch, minesLeft]);
 
   useEffect(() => {
     if (gameResetStatus) {
       btnRef.current.disabled = "";
       btnRef.current.className = "cell cell-default";
       btnRef.current.style = {};
+
+      setCellDisplayStatus(CELL_DISPLAY_STATUS.DEFAULT);
     }
-  }, [changeGameResetStatus, gameResetStatus, dispatch]);
+  }, [changeGameResetStatus, gameResetStatus, dispatch, hasMine]);
 
   const cellClickHandler = useCallback(() => {
+    Object.values(ADDITIONAL_CELL_CLASSES).forEach(it => btnRef.current.classList.remove(it));
+
     const value = boardMap[row][cell];
 
     if (value === 0) {
       const autoOpenArea = getAutoOpenArea(boardMap, row, cell);
+      const mappedOpenAreaData = autoOpenArea.map(([row, cell]) => `${row},${cell}`);
 
       dispatch(setOpenArea(autoOpenArea));
+      dispatch(addOpenedCells(mappedOpenAreaData));
+
+      return;
     }
 
-    btnRef.current.style.backgroundPosition = `-${(value - 1) * 31}px -120px`;
+    btnRef.current.classList.add(`cell-active-${value}`);
     btnRef.current.disabled = "disabled";
+
+    if (!hasMine && value !== 0) {
+      dispatch(addOpenedCells(`${row},${cell}`));
+    }
 
     if (hasMine) {
       setIsBlown(true);
@@ -78,10 +110,12 @@ const Cell = ({ row, cell }) => {
 
       btnRef.current.classList.add("cell-blown-mine");
     }
-  }, [changeGameEndStatus, changeSmileStatus, cell, dispatch, boardMap, hasMine, row, setOpenArea]);
+  }, [changeGameEndStatus, changeSmileStatus, cell, dispatch, boardMap, hasMine, row, setOpenArea, addOpenedCells]);
 
   const cellMouseDownHandler = useCallback((e) => {
-    if (e.nativeEvent.which === 3) {
+    const RIGHT_MOUSE_CLICK_CODE = 3;
+
+    if (e.nativeEvent.which === RIGHT_MOUSE_CLICK_CODE || e.ctrlKey) {
       return;
     }
 
@@ -92,10 +126,6 @@ const Cell = ({ row, cell }) => {
       const boardMap = generateMap(ROWS, CELLS, MAX_MINES_COUNT, currentCoords);
 
       dispatch(setBoardMap(boardMap));
-
-      const value = boardMap[row][cell];
-
-      btnRef.current.style.backgroundPosition = `-${(value - 1) * 31}px -120px`;
     }
 
     dispatch(changeSmileStatus(SMILE_STATUS.CELL_CLICKED));
@@ -115,8 +145,12 @@ const Cell = ({ row, cell }) => {
 
     switch (cellDisplayStatus) {
       case CELL_DISPLAY_STATUS.DEFAULT:
-        setCellDisplayStatus(CELL_DISPLAY_STATUS.FLAG);
-        dispatch(decreaseMinesLeftCount());
+        if (minesLeft !== 0) {
+          setCellDisplayStatus(CELL_DISPLAY_STATUS.FLAG);
+          dispatch(decreaseMinesLeftCount());
+        } else {
+          setCellDisplayStatus(CELL_DISPLAY_STATUS.QUESTION_MARK);
+        }
         break;
 
       case CELL_DISPLAY_STATUS.FLAG:
@@ -131,26 +165,26 @@ const Cell = ({ row, cell }) => {
       default:
         setCellDisplayStatus(CELL_DISPLAY_STATUS.DEFAULT);
     }
-  }, [cellDisplayStatus, decreaseMinesLeftCount, dispatch, increaseMinesLeftCount]);
+  }, [cellDisplayStatus, decreaseMinesLeftCount, dispatch, increaseMinesLeftCount, minesLeft]);
 
   const getButtonClassName = useCallback(() => {
     let additionalClass;
 
     switch (cellDisplayStatus) {
       case CELL_DISPLAY_STATUS.DEFAULT:
-        additionalClass = "cell-default";
+        additionalClass = ADDITIONAL_CELL_CLASSES.DEFAULT;
         break;
 
       case CELL_DISPLAY_STATUS.FLAG:
-        additionalClass = "cell-flag";
+        additionalClass = ADDITIONAL_CELL_CLASSES.FLAG;
         break;
 
       case CELL_DISPLAY_STATUS.QUESTION_MARK:
-        additionalClass = "cell-question-mark";
+        additionalClass = ADDITIONAL_CELL_CLASSES.QUESTION_MARK;
         break;
 
       default:
-        additionalClass = "cell-default";
+        additionalClass = ADDITIONAL_CELL_CLASSES.DEFAULT;
         break;
     }
 

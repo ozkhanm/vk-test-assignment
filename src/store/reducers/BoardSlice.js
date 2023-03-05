@@ -8,7 +8,8 @@ const initialState = {
   gameEndStatus: false,
   openArea: [],
   minesLeft: MAX_MINES_COUNT,
-  gameResetStatus: false
+  gameResetStatus: false,
+  openedCells: []
 };
 
 export const boardSlice = createSlice({
@@ -33,9 +34,21 @@ export const boardSlice = createSlice({
     increaseMinesLeftCount(state) {
       state.minesLeft++;
     },
+    setMinesLeftCount(state, { payload }) {
+      state.minesLeft = payload;
+    },
     reset: () => initialState,
     changeGameResetStatus(state, { payload }) {
       state.gameResetStatus = payload;
+    },
+    addOpenedCells(state, { payload }) {
+      if (Array.isArray(payload)) {
+        state.openedCells = [...state.openedCells, ...payload];
+      } else {
+        state.openedCells.push(payload);
+      }
+
+      state.openedCells = Array.from(new Set(state.openedCells));
     }
   },
 });

@@ -25,6 +25,38 @@
   background-position: -30px -90px;
 }
 
+.cell-active-1 {
+  background-position: 0px -120px;
+}
+
+.cell-active-2 {
+  background-position: -31px -120px;
+}
+
+.cell-active-3 {
+  background-position: -62px -120px;
+}
+
+.cell-active-4 {
+  background-position: -93px -120px;
+}
+
+.cell-active-5 {
+  background-position: -124px -120px;
+}
+
+.cell-active-6 {
+  background-position: -155px -120px;
+}
+
+.cell-active-7 {
+  background-position: -186px -120px;
+}
+
+.cell-active-8 {
+  background-position: -217px -120px;
+}
+
 .cell-mine {
   background-position: -152px -90px;
 }
